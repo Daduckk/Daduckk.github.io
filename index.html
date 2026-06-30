@@ -121,6 +121,15 @@
   }
   .project-card .thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s ease;}
   .project-card:hover .thumb img{transform:scale(1.04);}
+  .project-card .thumb{position:relative;}
+  .project-card .play-icon{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    width:52px;height:52px;border-radius:50%;
+    background:rgba(21,20,15,.55);
+    display:flex;align-items:center;justify-content:center;
+    pointer-events:none;
+  }
+  .project-card .play-icon svg{width:18px;height:18px;fill:#FAF9F6;margin-left:2px;}
   .project-card .meta-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;}
   .project-card .num{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-soft);}
   .project-card .title{font-family:'Space Grotesk',sans-serif;font-size:21px;font-weight:500;letter-spacing:-.01em;margin-top:4px;}
@@ -139,6 +148,7 @@
   .lightbox-inner{max-width:1000px;width:100%;}
   .lightbox-stage{position:relative;display:flex;align-items:center;justify-content:center;}
   .lightbox-stage img{max-width:100%;max-height:72vh;display:block;border-radius:2px;}
+  .lightbox-stage video{max-width:100%;max-height:72vh;display:block;border-radius:2px;}
   .lightbox-close{
     position:absolute;top:-44px;right:0;
     background:none;border:none;color:#FAF9F6;
@@ -237,7 +247,7 @@
 
 <section class="hero" id="top">
   <div class="wrap">
-    <div class="eyebrow mono">Graphic design — Talisay City, Cebu</div>
+    <div class="eyebrow mono">Graphic design & video editing — Talisay City, Cebu</div>
     <div class="name">Fernan Joshua<br><span class="last">Sotto</span></div>
     <h1>I turn ideas into posters and visuals people stop scrolling for.</h1>
     <p class="sub">Industrial Technology graduate and graphic designer creating promotional graphics, posters, and social media content for brands, stores, and student organizations.</p>
@@ -321,6 +331,20 @@
           <span class="year">2022</span>
         </div>
       </div>
+      <div class="project-card" data-images='["images/anime-figure-edit-1-poster.jpg","images/anime-figure-edit-2-poster.jpg","images/anime-figure-edit-3-poster.jpg"]' data-videos='["videos/anime-figure-edit-1.mp4","videos/anime-figure-edit-2.mp4","videos/anime-figure-edit-3.mp4"]' data-title="Anime action figure edit — TikTok ad series">
+        <div class="thumb">
+          <img src="images/anime-figure-edit-1-poster.jpg" alt="Anime action figure edit TikTok ad thumbnail">
+          <div class="play-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>
+        <div class="meta-row">
+          <div>
+            <span class="num">07</span>
+            <div class="title">Anime action figure edit — TikTok ad series</div>
+            <div class="tags">Video editing, TikTok ad, 3 clips</div>
+          </div>
+          <span class="year">2026</span>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -331,6 +355,7 @@
       <button class="lightbox-close" id="lightboxClose" aria-label="Close">&times;</button>
       <button class="lightbox-nav prev" id="lightboxPrev" aria-label="Previous image">&#8249;</button>
       <img id="lightboxImg" src="" alt="">
+      <video id="lightboxVideo" controls playsinline style="display:none;"></video>
       <button class="lightbox-nav next" id="lightboxNext" aria-label="Next image">&#8250;</button>
     </div>
     <div class="lightbox-caption" id="lightboxCaption"></div>
@@ -346,6 +371,7 @@
       <p>I bring together technical know-how — from computer hardware to networking fundamentals — with a creative eye for branding and visual storytelling, which lets me move comfortably between design work and the technology that supports it.</p>
       <div class="skills">
         <span class="skill-pill">Graphic design</span>
+        <span class="skill-pill">Video editing</span>
         <span class="skill-pill">Adobe Photoshop</span>
         <span class="skill-pill">Adobe Illustrator</span>
         <span class="skill-pill">Social media management</span>
@@ -379,6 +405,7 @@
   const cards = document.querySelectorAll('.project-card');
   const lightbox = document.getElementById('lightbox');
   const lightboxImg = document.getElementById('lightboxImg');
+  const lightboxVideo = document.getElementById('lightboxVideo');
   const lightboxCaption = document.getElementById('lightboxCaption');
   const lightboxThumbs = document.getElementById('lightboxThumbs');
   const prevBtn = document.getElementById('lightboxPrev');
@@ -386,11 +413,24 @@
   const closeBtn = document.getElementById('lightboxClose');
 
   let currentImages = [];
+  let currentVideos = [];
   let currentIndex = 0;
   let currentTitle = '';
 
   function renderLightbox(){
-    lightboxImg.src = currentImages[currentIndex];
+    const hasVideo = currentVideos[currentIndex];
+    lightboxVideo.pause();
+    if(hasVideo){
+      lightboxVideo.src = currentVideos[currentIndex];
+      lightboxVideo.poster = currentImages[currentIndex] || '';
+      lightboxVideo.style.display = 'block';
+      lightboxImg.style.display = 'none';
+    } else {
+      lightboxImg.src = currentImages[currentIndex];
+      lightboxImg.style.display = 'block';
+      lightboxVideo.style.display = 'none';
+      lightboxVideo.removeAttribute('src');
+    }
     lightboxCaption.textContent = currentTitle + ' — ' + (currentIndex+1) + ' / ' + currentImages.length;
     lightboxThumbs.innerHTML = '';
     if(currentImages.length > 1){
@@ -406,8 +446,9 @@
     nextBtn.style.display = currentImages.length > 1 ? 'block' : 'none';
   }
 
-  function openLightbox(images, title){
+  function openLightbox(images, videos, title){
     currentImages = images;
+    currentVideos = videos || [];
     currentTitle = title;
     currentIndex = 0;
     renderLightbox();
@@ -415,13 +456,15 @@
   }
 
   function closeLightbox(){
+    lightboxVideo.pause();
     lightbox.classList.remove('open');
   }
 
   cards.forEach(card=>{
     card.addEventListener('click', ()=>{
       const images = JSON.parse(card.dataset.images);
-      openLightbox(images, card.dataset.title);
+      const videos = card.dataset.videos ? JSON.parse(card.dataset.videos) : [];
+      openLightbox(images, videos, card.dataset.title);
     });
   });
 
