@@ -50,13 +50,23 @@
   /* Hero */
   .hero{padding:120px 0 100px;border-bottom:1px solid var(--line);}
   .hero .eyebrow{margin-bottom:24px;}
-  .hero h1{
+  .hero .name{
     font-family:'Space Grotesk',sans-serif;
     font-weight:700;
-    font-size:clamp(40px,7vw,84px);
-    line-height:1.02;
+    font-size:clamp(48px,9vw,108px);
+    line-height:0.95;
     letter-spacing:-.02em;
-    max-width:880px;
+    margin-bottom:20px;
+  }
+  .hero .name .last{color:var(--accent);}
+  .hero h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:500;
+    font-size:clamp(22px,3vw,30px);
+    line-height:1.25;
+    letter-spacing:-.01em;
+    max-width:640px;
+    color:var(--ink-soft);
   }
   .hero h1 em{
     font-style:normal;
@@ -218,7 +228,8 @@
 <section class="hero" id="top">
   <div class="wrap">
     <div class="eyebrow mono">Graphic design — Talisay City, Cebu</div>
-    <h1>I turn ideas into posters and visuals people <em>stop scrolling</em> for.</h1>
+    <div class="name">Fernan Joshua<br><span class="last">Sotto</span></div>
+    <h1>I turn ideas into posters and visuals people stop scrolling for.</h1>
     <p class="sub">Industrial Technology graduate and graphic designer creating promotional graphics, posters, and social media content for brands, stores, and student organizations.</p>
     <div class="cta-row">
       <a class="btn primary" href="#work">View work</a>
